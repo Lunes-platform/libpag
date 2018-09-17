@@ -19,7 +19,7 @@ class WebServerUtils {
                 'Content-Type': 'text/xml'
             },
             envelopeKey: 's'
-        };    
+        };
     }
 
     getExternalTerminal() {
@@ -54,7 +54,7 @@ class WebServerUtils {
 
     getAttrsByCardPayment(charging) {
         if (charging && charging.TipoPagamento.toUpperCase() === 'CARTAO') {
-            return { 
+            return {
                 QtdParcelas: charging.QtdParcelas,
                 pontos: 0,
                 nomeTitular: charging.nomeTitular,

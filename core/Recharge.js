@@ -16,7 +16,7 @@ class Recharge {
             const args = {
                 transacao: {
                     ...self.WebServerUtils.getTransactionArgs('TransacaoConsultaOperadoraDDD', 'CONSULTAOPERADORADDD'),
-                    CategoriaRecarga: 'TODOS',
+                    CategoriaRecarga: 'TELEFONE',
                     TipoRecarga: 'ONLINE',
                     ddd: dddValue
                 }
@@ -28,27 +28,28 @@ class Recharge {
                 method(args, function(err, result, envelope, soapHeader) {
                     if (err) reject(err);
 
-                    const { CodigoErro, MensagemErro, Operadoras } = result.ProcessaTransacaoResult;
+                    if (result.statusCode < 400 || !result.statusCode) {
+                        const { CodigoErro, MensagemErro, Operadoras } = result.ProcessaTransacaoResult;
 
-                    if (CodigoErro !== '000') {
-                        reject({
-                            error: true,
-                            code: CodigoErro,
-                            message: MensagemErro
-                        });
+                        if (CodigoErro !== '000') {
+                            reject({
+                                error: true,
+                                code: CodigoErro,
+                                message: MensagemErro
+                            });
+                        }
+                        resolve(Operadoras);
+                        // const operadoras = Operadoras.Operadora.map(item => {
+                        //   return {
+                        //     id: parseInt(item.OperadoraId),
+                        //     name: item.Nome,
+                        //     max: parseFloat(item.ValorMax),
+                        //     min: parseFloat(item.ValorMin)
+                        //   }
+                        // });
+
+                        // resolve(operadoras);
                     }
-                    console.log(Operadoras);
-                    resolve(Operadoras);
-                    // const operadoras = Operadoras.Operadora.map(item => {
-                    //   return {
-                    //     id: parseInt(item.OperadoraId),
-                    //     name: item.Nome,
-                    //     max: parseFloat(item.ValorMax),
-                    //     min: parseFloat(item.ValorMin)
-                    //   }
-                    // });
-
-                    // resolve(operadoras);
                 });
             });
         });
@@ -63,7 +64,7 @@ class Recharge {
         return new Promise((resolve, reject) => {
             const wsdlUri = self.WebServerUtils.getWSDL_URI();
             const options = self.WebServerUtils.getOptions();
-      
+
             const args = {
               transacao: {
                 ...self.WebServerUtils.getTransactionArgs('TransacaoConsultaValoresOperadoraDDD', 'CONSULTAVALORESOPERADORADDD'),
@@ -71,10 +72,10 @@ class Recharge {
                 ddd: dddValue
               }
             };
-      
+
             soap.createClient(wsdlUri, options, function(err, client) {
                 const method = self.WebServerUtils.getMethodToProcessTransaction(client);
-      
+
                 method(args, function(err, result, envelope, soapHeader) {
                     if (err) reject(err);
 
@@ -98,7 +99,7 @@ class Recharge {
                             min: parseFloat(item.ValorMin)
                         }
                     });
-                
+
                     resolve(valores);
                 });
             });
@@ -148,13 +149,13 @@ class Recharge {
                     //     }
                     //   });
                     // }
-                
+
                     // resolve(valores);
 
                     resolve(retorno);
                 });
             });
-        });   
+        });
     }
 
     /**
@@ -202,11 +203,11 @@ class Recharge {
                         StatusOperacao: DadosOperacao.StatusOperacao,
                         TerminalIdExterno: DadosOperacao.TerminalIdExterno
                     };
-                
+
                     resolve(retorno);
                 });
             });
-        }); 
+        });
     }
 
     consultaLimite() {
@@ -244,11 +245,11 @@ class Recharge {
                         LimiteCredito: parseFloat(consulta.LimiteCredito),
                         LimiteDisponivel: parseFloat(consulta.LimiteDisponivel)
                     }
-                    
+
                     resolve(retorno);
                 });
             });
-        });    
+        });
     }
 
     /**
@@ -278,7 +279,7 @@ class Recharge {
                         valorDesconto: 0
                     },
                     telefoneRecarga: {
-                        CodigoEstado: ddd, 
+                        CodigoEstado: ddd,
                         CodigoPais: 55,
                         Numero: phoneNumber
                     }
@@ -305,7 +306,7 @@ class Recharge {
 
                     const retorno = {
                         Autenticacao: consulta.Autenticacao,
-                        Comprovante: { 
+                        Comprovante: {
                             CamposComprovante: consulta.Comprovante.CamposComprovante,
                             ComprovanteFormatado: consulta.Comprovante.ComprovanteFormatado
                         },
@@ -313,11 +314,11 @@ class Recharge {
                         DataOperacao: consulta.DataOperacao,
                         ProtocoloId: consulta.ProtocoloId
                     }
-                    
+
                     resolve(retorno);
                 });
             });
-        });     
+        });
     }
 
     /**
@@ -357,11 +358,11 @@ class Recharge {
                     const retorno = {
                         StatusTransacao: consulta.StatusTransacao,
                     }
-                    
+
                     resolve(retorno);
                 });
             });
-        });     
+        });
     }
 }
 

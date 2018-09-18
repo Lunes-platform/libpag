@@ -292,10 +292,10 @@ class Recharge {
                 method(args, function(err, result, envelope, soapHeader) {
                     if (err) reject(err);
 
-                    const { CodigoErro, MensagemErro } = result.ProcessaTransacaoResult;
+                    const { CodigoErro, StatusTransacao, MensagemErro } = result.ProcessaTransacaoResult;
                     const consulta = result.ProcessaTransacaoResult;
 
-                    if (CodigoErro !== '000') {
+                    if (StatusTransacao !== 'SUCESSO') {
                         reject({
                             error: true,
                             code: CodigoErro,

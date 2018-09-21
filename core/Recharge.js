@@ -23,6 +23,9 @@ class Recharge {
             }
 
             soap.createClient(wsdlUri, options, function(err, client) {
+                if (err) {
+                    throw err;
+                }
                 const method = self.WebServerUtils.getMethodToProcessTransaction(client);
 
                 method(args, function(err, result, envelope, soapHeader) {

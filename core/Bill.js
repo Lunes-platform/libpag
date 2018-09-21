@@ -27,6 +27,9 @@ class Bill {
             }
 
             soap.createClient(wsdlUri, options, function(err, client) {
+                if (err) {
+                    throw err;
+                }
                 const method = self.WebServerUtils.getMethodToProcessTransaction(client);
 
                 method(args, function(err, result, envelope, soapHeader) {
@@ -75,11 +78,11 @@ class Bill {
                         ValorMaximo: consulta.ValorMaximo,
                         ValorMinimo: consulta.ValorMinimo
                     }
-                    
+
                     resolve(retorno);
                 });
             });
-        }); 
+        });
     }
 
     /**
@@ -143,18 +146,18 @@ class Bill {
                     //     }
                     //   });
                     // }
-                
+
                     // resolve(valores);
 
                     resolve(retorno);
                 });
             });
-        }); 
+        });
     }
 
     /**
      * 3. Consulta Status
-     * @param {string} protocoloId - 
+     * @param {string} protocoloId -
     */
     checkStatus(protocoloId) {
         const self = this;
@@ -214,15 +217,15 @@ class Bill {
                         StatusOperacao: DadosOperacao.StatusOperacao,
                         TerminalIdExterno: DadosOperacao.TerminalIdExterno
                     };
-                
+
                     resolve(retorno);
                 });
             });
-        }); 
+        });
     }
-    
+
     /**
-     * @param {object} charging - 
+     * @param {object} charging -
      *  Example: {
      *      DataVencimento: '2018-10-28T00:00:00Z',
      *      TipoServico: 'FichaCompensacao' / 'ContaConcessionaria',
@@ -230,7 +233,7 @@ class Bill {
      *      Valor: 99,
      *      TipoPagamento: 'DINHEIRO' or 'CARTAO',
      *      CpfCnpj: '03884192965' [OPTIONAL]
-     *  } 
+     *  }
     */
     pay(charging) {
         const self = this;
@@ -257,9 +260,9 @@ class Bill {
                     error: true,
                     code: 400,
                     message: 'TipoPagamento(DINHEIRO or CARTAO) is required'
-                })    
+                })
             }
-            
+
             const wsdlUri = self.WebServerUtils.getWSDL_URI();
             const options = self.WebServerUtils.getOptions();
             const args = {
@@ -272,7 +275,7 @@ class Bill {
                     CodBarras: {
                         TipoServico: charging.TipoServico,
                         linhaDigitavel: charging.LinhaDigitavel
-                    }, 
+                    },
                     DadosPagamento: {
                         FormaPagamento: charging.TipoPagamento.toUpperCase(),
                         valor: charging.Valor,
@@ -371,7 +374,7 @@ class Bill {
                     }
 
                     console.log("ESTORNO", consulta);
-                    
+
                     resolve(consulta);
                 });
             });
@@ -381,7 +384,7 @@ class Bill {
     /**
      * @param {string} protocoloId          - protocol id
      * @param {string} statusConfirmation   - 'CONFIRMADA' / 'CANCELADA'
-     * 
+     *
     */
     confirmPayment(protocoloId, statusConfirmation) {
         const self = this;

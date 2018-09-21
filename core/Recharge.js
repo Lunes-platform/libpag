@@ -24,36 +24,37 @@ class Recharge {
 
             soap.createClient(wsdlUri, options, function(err, client) {
                 if (err) {
-                    throw err;
-                }
-                const method = self.WebServerUtils.getMethodToProcessTransaction(client);
+                    reject(err);
+                } else {
+                    const method = self.WebServerUtils.getMethodToProcessTransaction(client);
 
-                method(args, function(err, result, envelope, soapHeader) {
-                    if (err) reject(err);
+                    method(args, function(err, result, envelope, soapHeader) {
+                        if (err) reject(err);
 
-                    if (result.statusCode < 400 || !result.statusCode) {
-                        const { CodigoErro, MensagemErro, Operadoras } = result.ProcessaTransacaoResult;
+                        if (result.statusCode < 400 || !result.statusCode) {
+                            const { CodigoErro, MensagemErro, Operadoras } = result.ProcessaTransacaoResult;
 
-                        if (CodigoErro !== '000') {
-                            reject({
-                                error: true,
-                                code: CodigoErro,
-                                message: MensagemErro
-                            });
+                            if (CodigoErro !== '000') {
+                                reject({
+                                    error: true,
+                                    code: CodigoErro,
+                                    message: MensagemErro
+                                });
+                            }
+                            resolve(Operadoras);
+                            // const operadoras = Operadoras.Operadora.map(item => {
+                            //   return {
+                            //     id: parseInt(item.OperadoraId),
+                            //     name: item.Nome,
+                            //     max: parseFloat(item.ValorMax),
+                            //     min: parseFloat(item.ValorMin)
+                            //   }
+                            // });
+
+                            // resolve(operadoras);
                         }
-                        resolve(Operadoras);
-                        // const operadoras = Operadoras.Operadora.map(item => {
-                        //   return {
-                        //     id: parseInt(item.OperadoraId),
-                        //     name: item.Nome,
-                        //     max: parseFloat(item.ValorMax),
-                        //     min: parseFloat(item.ValorMin)
-                        //   }
-                        // });
-
-                        // resolve(operadoras);
-                    }
-                });
+                    });
+                }
             });
         });
     }
